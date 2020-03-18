@@ -92,11 +92,11 @@ class Blockchain(object):
         :return: A valid proof for the provided block
         """
         # TODO
-        block_string = json.dumps(block, sort_keys=True)
+        block_string = json.dumps(block)
 
         proof = 0
 
-        while self.valid_proof(block_strong, proof) is False:
+        while self.valid_proof(block_string, proof) is False:
             proof += 1
 
         return proof
@@ -114,7 +114,10 @@ class Blockchain(object):
         :return: True if the resulting hash is a valid proof, False otherwise
         """
         # TODO
-        return hashlib.sha256(f'{block_strong}{proof}'.encode())[:3] == "000"
+        block_string = f'{block_string}{proof}'.encode()
+        hashed_block = hashlib.sha256(block_string).hexdigest()
+
+        return hashed_block[:3] == "000"
 
 
 # Instantiate our Node
@@ -130,14 +133,15 @@ blockchain = Blockchain()
 @app.route('/mine', methods=['GET'])
 def mine():
     # Run the proof of work algorithm to get the next proof
-    proof = blockchain.proof_of_work(blockchain.last_block())
+    block = blockchain.last_block
+    proof = blockchain.proof_of_work(block)
 
     # Forge the new Block by adding it to the chain with the proof
-    new_block = blockchain.new_block(proof, blockchain.hash(blockchain.last_block().previous_hash))
+    new_block = blockchain.new_block(proof, block["previous_hash"])
 
     response = {
         # TODO: Send a JSON response with the new block
-        "message": "New Block Mined"
+        "message": "New Block Mined",
         "new_block": new_block
     }
 
