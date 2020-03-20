@@ -64,7 +64,7 @@ class Blockchain(object):
         # or we'll have inconsistent hashes
 
         # TODO: Create the block_string
-        block_string = JSON.dumps(block).encode()
+        block_string = json.dumps(block).encode()
 
 
         # TODO: Hash this string using sha256
