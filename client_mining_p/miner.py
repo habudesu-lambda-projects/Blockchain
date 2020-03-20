@@ -14,7 +14,7 @@ def proof_of_work(block):
     :return: A valid proof for the provided block
     """
 
-    block_string = json.dumps(block)
+    block_string = json.dumps(block, sort_keys=True)
     proof = 0
 
     while valid_proof(block_string, proof) is False:
