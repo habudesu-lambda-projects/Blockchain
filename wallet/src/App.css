@@ -1,0 +1,12 @@
+.App {
+  text-align: center;
+  width: 100%;
+}
+
+.transaction {
+  display: flex;
+  width: 80%;
+  flex-direction: column;
+  border: 1px black solid;
+  margin: 20px auto;
+}
