@@ -64,7 +64,7 @@ class Blockchain(object):
         # or we'll have inconsistent hashes
 
         # TODO: Create the block_string
-        block_string = JSON.dumps(block).encode()
+        block_string = json.dumps(block).encode()
 
 
         # TODO: Hash this string using sha256
@@ -101,13 +101,13 @@ class Blockchain(object):
 
         return hashed_block[:6] == "000000"
 
-    def new_transaction(sender, recipient, amount):
+    def new_transaction(self, sender, recipient, amount):
         transaction = {
-            sender: sender,
-            recipient: recipient,
-            amount: amount,
-            index: len(blockchain.current_transactions) + 1,
-            timestamp: time()
+            "sender": sender,
+            "recipient": recipient,
+            "amount": amount,
+            "index": len(blockchain.chain) + 1,
+            "timestamp": time()
         }
 
         blockchain.current_transactions.append(transaction)
@@ -135,11 +135,12 @@ def mine():
     block = blockchain.last_block
     block_string = json.dumps(block, sort_keys=True)
     proof = data['proof']
+    id = data['id']
 
     if blockchain.valid_proof(block_string, proof):
         new_block = blockchain.new_block(proof, blockchain.hash(block))
 
-        blockchain.new_transaction("0", required['id'], 1)
+        blockchain.new_transaction("0", id, 1)
 
         response = {
             "message": "New Block Forged",
@@ -158,18 +159,17 @@ def mine():
 @app.route('/chain', methods=['GET'])
 def full_chain():
     response = {
-        # TODO: Return the chain and its current length
         "chain": blockchain.chain,
         "chain_length": len(blockchain.chain)
     }
-    return jsonify(response), 200
+    return jsonify(response), 200, {"Access-Control-Allow-Origin": "*"}
 
 @app.route('/last_block', methods=['GET'])
 def get_last_block():
-    response = {
+    res = {
         "last_block": blockchain.last_block
     }
-    return jsonify(response), 200
+    return jsonify(res), 200
 
 @app.route('/transactions/new', methods=['POST'])
 def add_transaction():
@@ -182,7 +182,7 @@ def add_transaction():
     else:
         response = {'messaage': blockchain.last_block() + 1}
         return jsonify(response), 201
-        
+
 # Run the program on port 5000
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
